@@ -1,0 +1,31 @@
+---
+title: "OEB 57 Pset"
+author: "Cassidy Bargell"
+date: "4/19/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(reprex)
+library(readr)
+library(readxl)
+library(janitor)
+library(gt)
+raw_data <- read_excel("raw-data/oeb 57 pset.xlsx") %>%
+  clean_names()
+
+raw_data$year <- as.character(raw_data$year)
+
+reg <- lm(mean_prey_count ~ mean_raid_duration, raw_data)
+```
+
+```{r}
+ggplot(raw_data, aes(x = mean_raid_duration, y = mean_prey_count, color = year)) +
+  geom_point() + geom_smooth(method = "loess", formula = y ~ x, span = 1.2, 
+                             color = "red", se = FALSE, 
+                             size = .5) 
+```
+
+
