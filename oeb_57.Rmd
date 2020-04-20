@@ -1,5 +1,5 @@
 ---
-title: "OEB 57 Pset"
+title: "Marginal Value Theorem"
 author: "Cassidy Bargell"
 date: "4/19/2020"
 output: html_document
@@ -12,20 +12,374 @@ library(reprex)
 library(readr)
 library(readxl)
 library(janitor)
+library(infer)
 library(gt)
-raw_data <- read_excel("raw-data/oeb 57 pset.xlsx") %>%
+library(broom)
+library(ggformula)
+library(graphics)
+
+raid <- read_excel("raw-data/oeb 57 pset.xlsx") %>%
   clean_names()
 
-raw_data$year <- as.character(raw_data$year)
-
-reg <- lm(mean_prey_count ~ mean_raid_duration, raw_data)
+raid$year <- as.character(raid$year)
 ```
+### Question 2
+
+#### 2a) 
 
 ```{r}
-ggplot(raw_data, aes(x = mean_raid_duration, y = mean_prey_count, color = year)) +
-  geom_point() + geom_smooth(method = "loess", formula = y ~ x, span = 1.2, 
-                             color = "red", se = FALSE, 
-                             size = .5) 
+ggplot(raid) + geom_spline(aes(x = mean_raid_duration, y = mean_prey_count), df = 4) + 
+  geom_point(aes(x = mean_raid_duration, y = mean_prey_count, color = year)) +
+  theme_classic() + 
+  labs(title = "Marginal Value Theorem Model",
+       x = "Mean Raid Duration", 
+       y = "Mean Prey Count", 
+       color = "Year")
 ```
 
+#### 2b)
 
+```{r 2011 predict}
+# Create x and y variables
+x<-raid$mean_raid_duration
+y<-raid$mean_prey_count
+
+# Use spline function instead of loess, another smoothing function,
+spl <- smooth.spline(y ~ x, df = 4)
+
+## Use predict for spline function first derivative
+newx <- 3.7
+pred0 <- predict(spl, x=newx, deriv=0)
+pred1 <- predict(spl, x=newx, deriv=1)
+
+## Calculate y intercept for given x (newx)
+yint <- pred0$y - (pred1$y*newx)
+
+xint <- (0 - yint)/(pred1$y)
+
+# Load spline plot R package
+ggplot(raid) + geom_spline(aes(x = mean_raid_duration, y = mean_prey_count), df = 4) + 
+  expand_limits(x = -15, y = 0) + 
+  geom_abline(slope = pred1$y, intercept = yint, color = "red", linetype = "dashed") + 
+  geom_point(aes(x = mean_raid_duration, y = mean_prey_count, color = year)) + 
+  geom_hline(yintercept = 0) + 
+  geom_vline(xintercept = 0) + 
+  labs(title = "Marginal Value Theorem Model", subtitle = "Average Search Time 2011",
+       x = "Mean Raid Duration", 
+       y = "Mean Prey Count", 
+       color = "Year")
+```
+
+$$ y = `r pred1$y` * x + `r yint` $$
+
+Average search time 2011: `r xint`
+
+#### 2c) 
+
+```{r}
+## Use predict for spline function first derivative
+newx <- 4.5
+pred0 <- predict(spl, x=newx, deriv=0)
+pred1 <- predict(spl, x=newx, deriv=1)
+
+## Calculate y intercept for given x (newx)
+yint <- pred0$y - (pred1$y*newx)
+
+xint <- (0 - yint)/(pred1$y)
+
+# Load spline plot R package
+ggplot(raid) + geom_spline(aes(x = mean_raid_duration, y = mean_prey_count), df = 4) + 
+  expand_limits(x = -15, y = 0) + 
+  geom_abline(slope = pred1$y, intercept = yint, color = "red", linetype = "dashed") + 
+  geom_point(aes(x = mean_raid_duration, y = mean_prey_count, color = year)) + 
+  geom_hline(yintercept = 0) +
+  geom_vline(xintercept = 0) + 
+  labs(title = "Marginal Value Theorem Model", subtitle = "Average Search Time 2004",
+       x = "Mean Raid Duration", 
+       y = "Mean Prey Count", 
+       color = "Year")
+```
+
+$$ y = `r pred1$y` * x + `r yint` $$
+
+Average search time 2004: `r xint`
+
+```{r 2005}
+## Use predict for spline function first derivative
+newx <- 2.2
+pred0 <- predict(spl, x=newx, deriv=0)
+pred1 <- predict(spl, x=newx, deriv=1)
+
+## Calculate y intercept for given x (newx)
+yint <- pred0$y - (pred1$y*newx)
+
+xint <- (0 - yint)/(pred1$y)
+
+# Load spline plot R package
+ggplot(raid) + geom_spline(aes(x = mean_raid_duration, y = mean_prey_count), df = 4) + 
+  expand_limits(x = -15, y = 0) + 
+  geom_abline(slope = pred1$y, intercept = yint, color = "red", linetype = "dashed") + 
+  geom_point(aes(x = mean_raid_duration, y = mean_prey_count, color = year)) + 
+  geom_hline(yintercept = 0) +
+  geom_vline(xintercept = 0) + 
+  labs(title = "Marginal Value Theorem Model", subtitle = "Average Search Time 2005",
+       x = "Mean Raid Duration", 
+       y = "Mean Prey Count", 
+       color = "Year")
+```
+
+$$ y = `r pred1$y` * x + `r yint` $$
+
+Average search time 2005: `r xint`
+
+```{r}
+## Use predict for spline function first derivative
+newx <- 1.2
+pred0 <- predict(spl, x=newx, deriv=0)
+pred1 <- predict(spl, x=newx, deriv=1)
+
+## Calculate y intercept for given x (newx)
+yint <- pred0$y - (pred1$y*newx)
+
+xint <- (0 - yint)/(pred1$y)
+
+# Load spline plot R package
+ggplot(raid) + geom_spline(aes(x = mean_raid_duration, y = mean_prey_count), df = 4) + 
+  expand_limits(x = -15, y = 0) + 
+  geom_abline(slope = pred1$y, intercept = yint, color = "red", linetype = "dashed") + 
+  geom_point(aes(x = mean_raid_duration, y = mean_prey_count, color = year)) + 
+  geom_hline(yintercept = 0) +
+  geom_vline(xintercept = 0) + 
+  labs(title = "Marginal Value Theorem Model", subtitle = "Average Search Time 2006",
+       x = "Mean Raid Duration", 
+       y = "Mean Prey Count", 
+       color = "Year")
+```
+
+$$ y = `r pred1$y` * x + `r yint` $$
+
+Average search time 2006: `r xint`
+
+```{r 2007}
+## Use predict for spline function first derivative
+newx <- 0.9
+pred0 <- predict(spl, x=newx, deriv=0)
+pred1 <- predict(spl, x=newx, deriv=1)
+
+## Calculate y intercept for given x (newx)
+yint <- pred0$y - (pred1$y*newx)
+
+xint <- (0 - yint)/(pred1$y)
+
+# Load spline plot R package
+ggplot(raid) + geom_spline(aes(x = mean_raid_duration, y = mean_prey_count), df = 4) + 
+  expand_limits(x = -15, y = 0) + 
+  geom_abline(slope = pred1$y, intercept = yint, color = "red", linetype = "dashed") + 
+  geom_point(aes(x = mean_raid_duration, y = mean_prey_count, color = year)) + 
+  geom_hline(yintercept = 0) +
+  geom_vline(xintercept = 0) + 
+  labs(title = "Marginal Value Theorem Model", subtitle = "Average Search Time 2007",
+       x = "Mean Raid Duration", 
+       y = "Mean Prey Count", 
+       color = "Year")
+```
+
+$$ y = `r pred1$y` * x + `r yint` $$
+
+Average search time 2007: `r xint`
+
+```{r 2008}
+## Use predict for spline function first derivative
+newx <- 0.7
+pred0 <- predict(spl, x=newx, deriv=0)
+pred1 <- predict(spl, x=newx, deriv=1)
+
+## Calculate y intercept for given x (newx)
+yint <- pred0$y - (pred1$y*newx)
+
+xint <- (0 - yint)/(pred1$y)
+
+# Load spline plot R package
+ggplot(raid) + geom_spline(aes(x = mean_raid_duration, y = mean_prey_count), df = 4) + 
+  expand_limits(x = -15, y = 0) + 
+  geom_abline(slope = pred1$y, intercept = yint, color = "red", linetype = "dashed") + 
+  geom_point(aes(x = mean_raid_duration, y = mean_prey_count, color = year)) + 
+  geom_hline(yintercept = 0) +
+  geom_vline(xintercept = 0) + 
+  labs(title = "Marginal Value Theorem Model", subtitle = "Average Search Time 2008",
+       x = "Mean Raid Duration", 
+       y = "Mean Prey Count", 
+       color = "Year")
+```
+
+$$ y = `r pred1$y` * x + `r yint` $$
+
+Average search time 2008: `r xint`
+
+```{r 2009}
+## Use predict for spline function first derivative
+newx <- 2.4
+pred0 <- predict(spl, x=newx, deriv=0)
+pred1 <- predict(spl, x=newx, deriv=1)
+
+## Calculate y intercept for given x (newx)
+yint <- pred0$y - (pred1$y*newx)
+
+xint <- (0 - yint)/(pred1$y)
+
+# Load spline plot R package
+ggplot(raid) + geom_spline(aes(x = mean_raid_duration, y = mean_prey_count), df = 4) + 
+  expand_limits(x = -15, y = 0) + 
+  geom_abline(slope = pred1$y, intercept = yint, color = "red", linetype = "dashed") + 
+  geom_point(aes(x = mean_raid_duration, y = mean_prey_count, color = year)) + 
+  geom_hline(yintercept = 0) +
+  geom_vline(xintercept = 0) + 
+  labs(title = "Marginal Value Theorem Model", subtitle = "Average Search Time 2009",
+       x = "Mean Raid Duration", 
+       y = "Mean Prey Count", 
+       color = "Year")
+```
+
+$$ y = `r pred1$y` * x + `r yint` $$
+
+Average search time 2009: `r xint`
+
+```{r 2010}
+## Use predict for spline function first derivative
+newx <- 2.1
+pred0 <- predict(spl, x=newx, deriv=0)
+pred1 <- predict(spl, x=newx, deriv=1)
+
+## Calculate y intercept for given x (newx)
+yint <- pred0$y - (pred1$y*newx)
+
+xint <- (0 - yint)/(pred1$y)
+
+# Load spline plot R package
+ggplot(raid) + geom_spline(aes(x = mean_raid_duration, y = mean_prey_count), df = 4) + 
+  expand_limits(x = -15, y = 0) + 
+  geom_abline(slope = pred1$y, intercept = yint, color = "red", linetype = "dashed") + 
+  geom_point(aes(x = mean_raid_duration, y = mean_prey_count, color = year)) + 
+  geom_hline(yintercept = 0) +
+  geom_vline(xintercept = 0) + 
+  labs(title = "Marginal Value Theorem Model", subtitle = "Average Search Time 2010",
+       x = "Mean Raid Duration", 
+       y = "Mean Prey Count", 
+       color = "Year")
+```
+
+$$ y = `r pred1$y` * x + `r yint` $$
+
+Average search time 2010: `r xint`
+
+```{r 2012}
+## Use predict for spline function first derivative
+newx <- 5.8
+pred0 <- predict(spl, x=newx, deriv=0)
+pred1 <- predict(spl, x=newx, deriv=1)
+
+## Calculate y intercept for given x (newx)
+yint <- pred0$y - (pred1$y*newx)
+
+xint <- (0 - yint)/(pred1$y)
+
+# Load spline plot R package
+ggplot(raid) + geom_spline(aes(x = mean_raid_duration, y = mean_prey_count), df = 4) + 
+  expand_limits(x = -15, y = 0) + 
+  geom_abline(slope = pred1$y, intercept = yint, color = "red", linetype = "dashed") + 
+  geom_point(aes(x = mean_raid_duration, y = mean_prey_count, color = year)) + 
+  geom_hline(yintercept = 0) +
+  geom_vline(xintercept = 0) + 
+  labs(title = "Marginal Value Theorem Model", subtitle = "Average Search Time 2012",
+       x = "Mean Raid Duration", 
+       y = "Mean Prey Count", 
+       color = "Year")
+```
+
+$$ y = `r pred1$y` * x + `r yint` $$
+
+Average search time 2012: `r xint`
+
+```{r 2013}
+## Use predict for spline function first derivative
+newx <- 7.0
+pred0 <- predict(spl, x=newx, deriv=0)
+pred1 <- predict(spl, x=newx, deriv=1)
+
+## Calculate y intercept for given x (newx)
+yint <- pred0$y - (pred1$y*newx)
+
+xint <- (0 - yint)/(pred1$y)
+
+# Load spline plot R package
+ggplot(raid) + geom_spline(aes(x = mean_raid_duration, y = mean_prey_count), df = 4) + 
+  expand_limits(x = -15, y = 0) + 
+  geom_abline(slope = pred1$y, intercept = yint, color = "red", linetype = "dashed") + 
+  geom_point(aes(x = mean_raid_duration, y = mean_prey_count, color = year)) + 
+  geom_hline(yintercept = 0) +
+  geom_vline(xintercept = 0) + 
+  labs(title = "Marginal Value Theorem Model", subtitle = "Average Search Time 2013",
+       x = "Mean Raid Duration", 
+       y = "Mean Prey Count", 
+       color = "Year")
+```
+
+$$ y = `r pred1$y` * x + `r yint` $$
+
+Average search time 2013: `r xint`
+
+```{r 2014}
+## Use predict for spline function first derivative
+newx <- 6.8
+pred0 <- predict(spl, x=newx, deriv=0)
+pred1 <- predict(spl, x=newx, deriv=1)
+
+## Calculate y intercept for given x (newx)
+yint <- pred0$y - (pred1$y*newx)
+
+xint <- (0 - yint)/(pred1$y)
+
+# Load spline plot R package
+ggplot(raid) + geom_spline(aes(x = mean_raid_duration, y = mean_prey_count), df = 4) + 
+  expand_limits(x = -15, y = 0) + 
+  geom_abline(slope = pred1$y, intercept = yint, color = "red", linetype = "dashed") + 
+  geom_point(aes(x = mean_raid_duration, y = mean_prey_count, color = year)) + 
+  geom_hline(yintercept = 0) +
+  geom_vline(xintercept = 0) + 
+  labs(title = "Marginal Value Theorem Model", subtitle = "Average Search Time 2014",
+       x = "Mean Raid Duration", 
+       y = "Mean Prey Count", 
+       color = "Year")
+```
+
+$$ y = `r pred1$y` * x + `r yint` $$
+
+Average search time 2014: `r xint`
+
+```{r 2015}
+## Use predict for spline function first derivative
+newx <- 8.8
+pred0 <- predict(spl, x=newx, deriv=0)
+pred1 <- predict(spl, x=newx, deriv=1)
+
+## Calculate y intercept for given x (newx)
+yint <- pred0$y - (pred1$y*newx)
+
+xint <- (0 - yint)/(pred1$y)
+
+# Load spline plot R package
+ggplot(raid) + geom_spline(aes(x = mean_raid_duration, y = mean_prey_count), df = 4) + 
+  expand_limits(x = -15, y = 0) + 
+  geom_abline(slope = pred1$y, intercept = yint, color = "red", linetype = "dashed") + 
+  geom_point(aes(x = mean_raid_duration, y = mean_prey_count, color = year)) + 
+  geom_hline(yintercept = 0) +
+  geom_vline(xintercept = 0) + 
+  labs(title = "Marginal Value Theorem Model", subtitle = "Average Search Time 2015",
+       x = "Mean Raid Duration", 
+       y = "Mean Prey Count", 
+       color = "Year")
+```
+
+$$ y = `r pred1$y` * x + `r yint` $$
+
+Average search time 2015: `r xint`
