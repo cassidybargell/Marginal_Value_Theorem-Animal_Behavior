@@ -2,7 +2,9 @@
 title: "Marginal Value Theorem"
 author: "Cassidy Bargell"
 date: "4/19/2020"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
